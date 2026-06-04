@@ -1,0 +1,22 @@
+services:
+  whisper-xtts:
+    build: .
+    image: whisper-xtts-server:latest
+    container_name: whisper-xtts-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Persist downloaded models across container rebuilds.
+      - ./models:/opt/voice-ai/models
+      # Optional: reference voices for XTTS cloning / default speaker.
+      - ./voices:/opt/voice-ai/voices
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

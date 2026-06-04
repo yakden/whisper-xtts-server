@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Local config & secrets
+.env
+
+# Models & generated audio (large; downloaded at deploy time)
+/opt/
+models/
+*.onnx
+*.pth
+*.wav
+*.mp3
+!tests/samples/*.wav
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

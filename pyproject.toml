@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whisper-xtts-server"
+version = "0.1.0"
+description = "Russian speech-to-text (faster-whisper) and text-to-speech (XTTS-v2 / Piper) REST API"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "yakden", email = "yakden@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "numpy>=1.24",
+    "soundfile>=0.12",
+    "faster-whisper>=1.0.3",
+    # XTTS-v2 via the maintained Coqui fork. Pulls in torch.
+    "coqui-tts>=0.24.1",
+    # Permissive-license TTS alternative.
+    "piper-tts>=1.2.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27"]
+
+[project.urls]
+Homepage = "https://github.com/yakden/whisper-xtts-server"
+
+[tool.setuptools.packages.find]
+include = ["app*"]

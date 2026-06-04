@@ -1,0 +1,13 @@
+# Append to /etc/pve/lxc/<CTID>.conf to share the host NVIDIA GPU into the container.
+# Verify device major numbers on the host with: ls -l /dev/nvidia*
+# (195 = nvidia0/nvidiactl; the uvm majors vary, check `ls -l /dev/nvidia-uvm*`).
+
+lxc.cgroup2.devices.allow: c 195:* rwm
+lxc.cgroup2.devices.allow: c 235:* rwm
+lxc.cgroup2.devices.allow: c 510:* rwm
+lxc.cgroup2.devices.allow: c 511:* rwm
+
+lxc.mount.entry: /dev/nvidia0 dev/nvidia0 none bind,optional,create=file
+lxc.mount.entry: /dev/nvidiactl dev/nvidiactl none bind,optional,create=file
+lxc.mount.entry: /dev/nvidia-uvm dev/nvidia-uvm none bind,optional,create=file
+lxc.mount.entry: /dev/nvidia-uvm-tools dev/nvidia-uvm-tools none bind,optional,create=file
