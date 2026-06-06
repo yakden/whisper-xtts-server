@@ -5,7 +5,8 @@ from __future__ import annotations
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from . import __version__
 from .api import speech, transcription
@@ -45,9 +46,35 @@ async def auth_middleware(request: Request, call_next):
         header = request.headers.get("authorization", "")
         token = header[7:] if header.lower().startswith("bearer ") else None
         if token != settings.api_key:
-            raise HTTPException(status_code=401, detail="Invalid or missing API key.")
+            # Return directly: HTTPException raised inside Starlette middleware is
+            # not handled by FastAPI's exception handlers and surfaces as a 500.
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Invalid or missing API key."},
+                headers={"WWW-Authenticate": "Bearer"},
+            )
     return await call_next(request)
 
+
+def _custom_openapi():
+    # Declare the bearer scheme so Swagger UI shows an "Authorize" button and can
+    # send `Authorization: Bearer <key>` for the middleware to check. Only added
+    # when an API key is actually configured.
+    if app.openapi_schema:
+        return app.openapi_schema
+    from fastapi.openapi.utils import get_openapi
+
+    schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
+    if get_settings().api_key:
+        schema.setdefault("components", {}).setdefault("securitySchemes", {})[
+            "bearerAuth"
+        ] = {"type": "http", "scheme": "bearer"}
+        schema["security"] = [{"bearerAuth": []}]
+    app.openapi_schema = schema
+    return schema
+
+
+app.openapi = _custom_openapi
 
 app.include_router(transcription.router)
 app.include_router(speech.router)

@@ -66,6 +66,10 @@ class XTTSEngine(TTSEngine):
         elif voice:
             # XTTS ships a set of built-in studio speakers selectable by name.
             kwargs["speaker"] = voice
+        elif self.settings.xtts_default_voice:
+            # Fall back to a configured built-in speaker so the endpoint works
+            # without any voice supplied (e.g. quick tests from Swagger UI).
+            kwargs["speaker"] = self.settings.xtts_default_voice
         else:
             raise ValueError(
                 "XTTS requires a reference voice: provide `speaker_wav`, set "

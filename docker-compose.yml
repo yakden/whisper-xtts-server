@@ -5,7 +5,8 @@ services:
     container_name: whisper-xtts-server
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      # Bind to loopback only — reach it via SSH tunnel, not the public IP.
+      - "127.0.0.1:8000:8000"
     env_file:
       - .env
     volumes:

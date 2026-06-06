@@ -21,6 +21,10 @@ dependencies = [
     "faster-whisper>=1.0.3",
     # XTTS-v2 via the maintained Coqui fork. Pulls in torch.
     "coqui-tts>=0.24.1",
+    # coqui-tts allows transformers>=4.57 but its tortoise module imports
+    # GPT2PreTrainedModel from the transformers top level, which 5.x removed.
+    # Pin below 5.0 until coqui-tts updates the import path.
+    "transformers>=4.57,<5",
     # Permissive-license TTS alternative.
     "piper-tts>=1.2.0",
 ]

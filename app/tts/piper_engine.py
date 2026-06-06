@@ -30,7 +30,9 @@ class PiperEngine(TTSEngine):
         if not self.settings.piper_model_path:
             raise RuntimeError("PIPER_MODEL_PATH is not set; download a Piper voice first.")
 
-        from piper import PiperVoice  # lazy import
+        from piper import PiperVoice, SynthesisConfig  # lazy import
+
+        self._SynthesisConfig = SynthesisConfig
 
         model = str(self.settings.piper_model_path)
         config = str(self.settings.piper_config_path) if self.settings.piper_config_path else None
@@ -55,11 +57,12 @@ class PiperEngine(TTSEngine):
         speaker_id = int(voice) if voice and voice.isdigit() else None
         length_scale = 1.0 / speed if speed else 1.0
 
+        # piper>=1.3 takes synthesis options via a SynthesisConfig object.
+        syn_config = self._SynthesisConfig(speaker_id=speaker_id, length_scale=length_scale)
+
         chunks: list[np.ndarray] = []
         sample_rate = self._voice.config.sample_rate
-        for audio_chunk in self._voice.synthesize(
-            text, speaker_id=speaker_id, length_scale=length_scale
-        ):
+        for audio_chunk in self._voice.synthesize(text, syn_config=syn_config):
             # piper>=1.3 yields AudioChunk objects with int16 PCM bytes.
             pcm = np.frombuffer(audio_chunk.audio_int16_bytes, dtype=np.int16)
             chunks.append(pcm.astype(np.float32) / 32768.0)

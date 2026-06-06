@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     xtts_model: str = "tts_models/multilingual/multi-dataset/xtts_v2"
     # Default reference voice (6+ sec wav) used when a request omits a speaker sample.
     xtts_default_speaker_wav: Path | None = None
+    # Fallback to one of XTTS's built-in studio speakers when a request provides
+    # neither `speaker_wav` nor `voice` and no default wav is set. Lets
+    # /v1/audio/speech work out of the box (e.g. from Swagger UI). Empty => off.
+    xtts_default_voice: str = "Ana Florence"
 
     # Piper (MIT licensed). Point these at a downloaded Russian voice.
     piper_model_path: Path | None = None
